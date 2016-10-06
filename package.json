@@ -1,0 +1,28 @@
+{
+  "name": "aws-instance-counts",
+  "version": "0.1.0",
+  "description": "Quickly fetch EC2 and RDS instance counts from AWS",
+  "main": "index.js",
+  "scripts": {
+    "test": "snyk test"
+  },
+  "keywords": [
+    "aws",
+    "cost",
+    "cultivatedops",
+    "ec2",
+    "rds"
+  ],
+  "author": "Kerim Satirli <kerim@cultivatedops.com>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "async": "^2.0.1",
+    "aws-sdk": "^2.6.6",
+    "chalk": "^1.1.3",
+    "lodash": "^4.16.3",
+    "minimist": "^1.2.0"
+  },
+  "devDependencies": {
+    "snyk": "^1.19.1"
+  }
+}

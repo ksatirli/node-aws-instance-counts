@@ -1,26 +1,38 @@
 {
   "name": "aws-instance-counts",
   "version": "0.1.0",
-  "description": "Quickly fetch EC2 and RDS instance counts from AWS",
+  "description": "Quickly fetch EC2 and/or RDS instance counts from AWS",
   "main": "index.js",
   "scripts": {
-    "test": "snyk test"
+    "prepublishOnly": "nsp check",
+    "pretest": "eslint .",
+    "precommit": "lint-staged",
+    "test": "npm run prepublishOnly"
   },
-  "keywords": [
-    "aws",
-    "cost",
-    "cultivatedops",
-    "ec2",
-    "rds"
-  ],
-  "author": "Kerim Satirli <kerim@cultivatedops.com>",
+  "keywords": ["aws", "cost", "ec2", "rds"],
+  "author": {
+    "name": "Method",
+    "email": "team@withmethod.com",
+    "url": "withmethod.com"
+  },
   "license": "Apache-2.0",
   "dependencies": {
-    "async": "^2.5.0",
-    "aws-sdk": "^2.121.0",
-    "chalk": "^2.1.0",
-    "lodash": "^4.17.4",
+    "async": "^2.6.0",
+    "aws-sdk": "^2.224.1",
+    "chalk": "^2.3.2",
+    "lodash": "^4.17.5",
     "minimist": "^1.2.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "husky": "^0.14.3",
+    "lint-staged": "^7.0.4",
+    "nsp": "^3.2.1",
+    "prettier": "^1.12.0",
+    "release-it": "^7.4.0",
+    "standard": "^11.0.1"
+  },
+  "lint-staged": {
+    "*.js": ["standard --fix", "git add"],
+    "*.json": ["prettier --write", "git add"]
+  }
 }

@@ -1,124 +1,101 @@
-'use strict';
+const async = require('async')
+const chalk = require('chalk')
+const lib = require('./lib/functions')
+const env = process.env
+const red = chalk.red
+const underline = chalk.white.underline
 
-var debug = false; // set this by passing `--debug="true"`
-var target = 'ec2'; // set this by passing `--target="rds"`
-var accessKey = null;
-var secretAccessKey = null;
-var region = null;
-
-var async = require('async');
-var chalk = require('chalk');
-
-// parse argv
-var argv = require('minimist')(process.argv.slice(2));
-
-// toggle debug mode
-if (argv.debug === 'true') {
-  debug = true;
+let opts = {
+  debug: false, // set this by passing `--debug="true"`
+  target: 'ec2', // set this by passing `--target="rds"`
+  accessKey: null,
+  secretAccessKey: null,
+  region: null,
+  AWS_ACCESS_KEY: null,
+  AWS_SECRET_ACCESS_KEY: null,
+  AWS_REGION: null
 }
 
-// toggle debug mode
-if (argv.target === 'rds') {
-  target = 'rds';
-}
+// assigning cli option
+var argv = require('minimist')(process.argv.slice(2))
+opts = Object.assign(argv, opts)
 
-// check if access credentials have been passed as arguments
-if (typeof argv.AWS_ACCESS_KEY === 'undefined' ||
-    typeof argv.AWS_SECRET_ACCESS_KEY === 'undefined' ||
-    typeof argv.AWS_REGION === 'undefined') {
-
-  // check if access credentials are available through environment
-  if (typeof process.env.AWS_ACCESS_KEY === 'undefined' ||
-      typeof process.env.AWS_SECRET_ACCESS_KEY === 'undefined' ||
-      typeof process.env.AWS_REGION === 'undefined') {
-    console.error(chalk.red('Unable to fetch AWS access credentials and region from environment or CLI arguments.'));
-
-    process.exit(1);
+if (!opts.AWS_ACCESS_KEY || !opts.AWS_SECRET_ACCESS_KEY || !opts.AWS_REGION) {
+  if (!env.AWS_ACCESS_KEY || !env.AWS_SECRET_ACCESS_KEY || !env.AWS_REGION) {
+    console.error(red('Unable to fetch AWS access credentials and region from environment or CLI arguments.'))
   } else {
-    console.log(chalk.dim('Setting AWS access credentials and region from environment variables'));
-
-    accessKey = process.env.AWS_ACCESS_KEY;
-    secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
-    region = process.env.AWS_REGION;
+    opts = Object.assign(env, argv)
   }
-} else {
-  console.log(chalk.dim('Setting AWS access credentials from CLI arguments'));
-
-  accessKey = argv.AWS_ACCESS_KEY;
-  secretAccessKey = argv.AWS_SECRET_ACCESS_KEY;
-  region = argv.AWS_REGION;
 }
+
+opts.accessKey = opts.AWS_ACCESS_KEY
+opts.secretAccessKey = opts.AWS_SECRET_ACCESS_KEY
+opts.region = opts.AWS_REGION
 
 // fetch instances
-var lib = require('./lib/functions');
 
 async.waterfall([
-  function(callback) {
+  cb => {
     // add goodness to payload
-    var payload = {
+    const payload = {
       credentials: {
-        accessKey: accessKey,
-        secretAccessKey: secretAccessKey,
-        region: region
+        accessKey: opts.accessKey,
+        secretAccessKey: opts.secretAccessKey,
+        region: opts.region
       },
-
       ec2Params: {},
-
       rdsParams: {},
-
-      debug: debug,
-
-      target: target
-    };
+      debug: opts.debug,
+      target: opts.target
+    }
 
     // pretty-print AWS access credentials, if debug mode is enabled
     if (payload.debug) {
-      console.log();
-      console.log('------------------------------------------------------------------------');
-      console.log('AWS Access Key:            ', chalk.white.underline(accessKey));
-      console.log('AWS Secret Access Key:     ', chalk.white.underline(secretAccessKey));
-      console.log('AWS Region:                ', chalk.white.underline(region));
-      console.log('------------------------------------------------------------------------');
-      console.log();
+      console.log()
+      console.log('------------------------------------------------------------------------')
+      console.log('AWS Access Key:            ', underline(opts.accessKey))
+      console.log('AWS Secret Access Key:     ', underline(opts.secretAccessKey))
+      console.log('AWS Region:                ', underline(opts.region))
+      console.log('------------------------------------------------------------------------')
+      console.log()
     }
 
-    callback(null, payload);
+    cb(null, payload)
   },
 
   // switch between EC2 and RDS
-  function(payload, callback) {
-    if (target === 'ec2') {
-      lib.getEc2InstanceData(payload, callback);
-    } else if (target === 'rds') {
-      lib.getRdsInstanceData(payload, callback);
+  (payload, cb) => {
+    if (opts.target === 'ec2') {
+      lib.getEc2InstanceData(payload, cb)
+    } else if (opts.target === 'rds') {
+      lib.getRdsInstanceData(payload, cb)
     } else {
-      callback('Target is not supported.');
+      cb(new Error('Target is not supported.'))
     }
   },
 
   // switch between EC2 and RDS
-  function(payload, callback) {
-    if (target === 'ec2') {
-      lib.getEc2InstanceCounts(payload, callback);
-    } else if (target === 'rds') {
-      lib.getRdsInstanceCounts(payload, callback);
+  (payload, cb) => {
+    if (opts.target === 'ec2') {
+      lib.getEc2InstanceCounts(payload, cb)
+    } else if (opts.target === 'rds') {
+      lib.getRdsInstanceCounts(payload, cb)
     } else {
-      callback('Target is not supported.');
+      cb(new Error('Target is not supported.'))
     }
   },
 
+  // printing nicely
   lib.prettyPrintInstanceCounts
 ],
 // optional callback
-function(err, results) {
+(err, results) => {
   if (err) {
-    console.error(chalk.red('An error occurred while attempting to retrieve data from AWS:'));
-    console.error(chalk.red(err));
-
-    process.exit(1);
+    console.error(red('An error occurred while attempting to retrieve data from AWS:'))
+    console.error(red(err))
+    process.exit(1)
   } else {
-    void results;
-
-    process.exit(0);
+    void results
+    process.exit(0)
   }
-});
+})

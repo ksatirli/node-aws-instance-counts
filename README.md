@@ -1,3 +1,16 @@
+# `aws-instance-counts`
+
+> Quickly get an overview of running AWS EC2 and RDS Instances
+
+## This project is no longer maintained
+
+`aws-instance-counts` is no longer actively maintained and is only made available here for reference. The project itself is still capable of listing AWS EC2 and RDS instances.
+
+What follows is the original `README.md`:
+
+---
+
+## Table of Contents
 ## Author Information
 
 This module is maintained by the contributors listed on [GitHub](https://github.com/operatehappy/node-link-git-hooks/graphs/contributors)

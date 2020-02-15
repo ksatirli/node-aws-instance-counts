@@ -11,6 +11,35 @@ What follows is the original `README.md`:
 ---
 
 ## Table of Contents
+
+- [Requirements](#requirements)
+- [Dependencies](#dependencies)
+- [Usage](#usage)
+- [Author Information](#author-information)
+- [License](#license)
+
+## Requirements
+
+This module requires Node.js version `4.x.x` or newer.
+
+## Dependencies
+
+This scripts requires you to have access to valid AWS IAM keys
+
+## Usage
+
+Add the module to your Terraform resources like so:
+
+```sh
+export AWS_ACCESS_KEY="AKIAIOSFODNN7EXAMPLE"
+export AWS_SECRET_ACCESS_KEY="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+export AWS_REGION="us-east-1"
+export DEBUG=true
+export TARGET=ec2
+
+node index
+```
+
 ## Author Information
 
 This module is maintained by the contributors listed on [GitHub](https://github.com/operatehappy/node-link-git-hooks/graphs/contributors)
